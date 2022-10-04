@@ -26,3 +26,11 @@ from feature_engine.selection import DropConstantFeatures, DropDuplicateFeatures
 logger = logging.getLogger(__name__)
 
 
+
+data= pd.read_csv('../data/interim/BreastCancerDS.csv')
+
+def get_data(data:data) -> pd.DataFrame:
+    data= pd.read_csv('../data/interim/BreastCancerDS.csv')
+    return data
+
+
