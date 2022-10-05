@@ -41,12 +41,18 @@ def etl_processing(data: pd.DataFrame) -> pd.DataFrame:
     mlflow.log_param("shape raw_data", data.shape)
 
     data = (data
-                    .pipe(drop_exact_duplicates)
-                    .pipe(drop_duplicates, drop_cols=['index'])
-                    .pipe(clean_misslabeled)
-                    .pipe(transform_output)
-                    .pipe(drop_exact_duplicates)
-                    .pipe(sort_data, col = 'diagnosis')
+            .pipe(data_tostring)
+            .pipe(clean_blankspaces, cols_to_clean=data.columns)
+            .pipe(replace_values,
+                  replace_values=['rxctf378968 7656463sdfg', '-88888765432345.0', '999765432456788.0', '?'])
+            .pipe(data_tofloat)
+            .pipe(to_category)
+            .pipe(drop_exact_duplicates)
+            .pipe(drop_duplicates, drop_cols=['index'])
+            .pipe(clean_misslabeled)
+            .pipe(transform_output)
+            .pipe(drop_exact_duplicates)
+            .pipe(sort_data, col='diagnosis')
                     )
 
     pipe_functions = [
@@ -164,3 +170,48 @@ def clean_misslabeled(data:pd.DataFrame)->pd.DataFrame():
     """function to drop a row which target is wrongly labeled  """
     data = data[(data['diagnosis'] == 'B') | (data['diagnosis'] == 'M')]
     return data
+
+
+
+##------------- help functions----------------------------
+
+##function to transform target to category
+def to_category(data:pd.DataFrame)->pd.DataFrame:
+    """Convert a colum to category"""
+    data['diagnosis'].astype('category')
+    return data
+
+#Function to convert columns of a df to float type
+def data_tofloat(data:pd.DataFrame)->pd.DataFrame:
+    """Change dataset columns dtype"""
+    data=data.astype('float')
+    return data
+#function to convert columns of a df to stirng type
+
+def data_tostring(data:pd.DataFrame)->pd.DataFrame:
+    """Convert dataset columns to type string """
+    data = data.astype('string')
+    return data
+
+
+# funtion to remove columns from data
+def drop_cols(data: pd.DataFrame,
+              drop_cols: list = None) -> pd.DataFrame:
+    """Drop columns from data."""
+    return data.drop(drop_cols, axis=1)
+
+# function to replace values with np.nan
+def replace_values(data: pd.DataFrame,
+                           replace_values: list) -> pd.DataFrame:
+    """Replace missing values in data with np.nan"""
+    data=data.replace(replace_values, np.nan)
+    return data
+
+#Function to clean blankspaces after each string of the dataset
+def clean_blankspaces(data:pd.DataFrame,cols_to_clean:list)-> pd.DataFrame:
+    """Function to delete blankspaces after and before each string of the dataset"""
+    for i in cols_to_clean:
+        data[i] = data[i].str.strip()
+    return data
+
+
