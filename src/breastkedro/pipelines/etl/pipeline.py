@@ -22,5 +22,21 @@ def create_pipeline(**kwargs) -> Pipeline:
                 func=etl_processing,
                 inputs=["data_original", "parameters"],
                 outputs="data_preprocessed",
-                name="etl_transforms")
-            ])
+                name="etl_transforms"),
+            node (
+                func=data_integrity_validation,
+                inputs=["data_preprocessed","parameters"],
+                outputs="data_integrity_check",
+                name="data_integrity_validation"),
+
+            node(
+                func=split_data,
+                inputs=["data_integrity_check", "parameters"],
+                outputs=["x_train_split",
+                         "x_test_split",
+                         "y_train_split",
+                         "y_test_split"],
+                name="split-train_test",
+            )
+
+                                              ])

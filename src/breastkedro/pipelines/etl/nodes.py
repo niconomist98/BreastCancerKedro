@@ -112,18 +112,15 @@ def split_data(data: pd.DataFrame, parameters: Dict) -> Tuple:
 # Function to validate data integrity
 def data_integrity_validation(data: pd.DataFrame,
                               parameters: Dict) -> pd.DataFrame:
-
-    numerical_features = parameters['categorical_cols']
     label = parameters['target_column']
 
     dataset = Dataset(data,
-                 label=label,
-                numerical_features=numerical_features)
+                 label=label)
 
     # Run Suite:
     integ_suite = data_integrity()
     suite_result = integ_suite.run(dataset)
-    mlflow.set_experiment('readmission')
+    mlflow.set_experiment('Breast Cancer')
     mlflow.log_param(f"data integrity validation", str(suite_result.passed()))
     if not suite_result.passed():
         # save report in data/08_reporting
