@@ -6,74 +6,40 @@
 filepath: ../data/01_raw/BreastCancerDS.csv
 
 features:
-  
   -index
-  
   -perimeter_se
-  
   -radius_worst
-  
   -concave points_mean
-  
   -smoothness_mean
-  
   -area_mean
-  
   -concavity_se
-  
   -texture_mean
-  
   -concavity_worst
-  
   -smoothness_se
-  
   -concave points_se
-  
   -area_worst
-  
   -compactness_mean
-  
   -radius_mean
-  
   -area_se
-  
   -concave points_worst
-  
   -iuytr
-  
   -fractal_dimension_worst
-  
   -perimeter_worst
-  
   -texture_se
-  
   -fractal_dimension_mean
-  
   -texture_worst
-  
   -smoothness_worst
-  
   -concavity_mean
-  
   -id
-  
   -symmetry_mean
-  
   -symmetry_worst
-  
   -erty
-  
   -fractal_dimension_se
-  
   -perimeter_mean
-  
   -compactness_worst
-  
   -symmetry_se
-  
   -compactness_se
-  
-  -radius_se
+  -radius_se|
   
 
 target_column: diagnosis
@@ -82,73 +48,69 @@ categorical_cols:
 
 numerical_cols:
   -index
-  
   -perimeter_se
-  
   -radius_worst
-  
   -concave points_mean
-  
   -smoothness_mean
-  
   -area_mean
-  
   -concavity_se
-  
   -texture_mean
-  
   -concavity_worst
-  
   -smoothness_se
-  
   -concave points_se
-  
   -area_worst
-  
   -compactness_mean
-  
   -radius_mean
-  
   -area_se
-  
   -concave points_worst
-  
   -iuytr
-  
   -fractal_dimension_worst
-  
   -perimeter_worst
-  
   -texture_se
-  
   -fractal_dimension_mean
-  
   -texture_worst
-  
   -smoothness_worst
-  
   -concavity_mean
-  
   -id
-  
   -symmetry_mean
-  
   -symmetry_worst
-  
   -erty
-  
   -fractal_dimension_se
-  
   -perimeter_mean
-  
   -compactness_worst
-  
   -symmetry_se
-  
   -compactness_se
-  
   -radius_se
 
 split:
   test_size: 0.2
   random_state: 3
+
+features2:
+  [index,perimeter_se ,
+               radius_worst,
+               concave points_mean,
+               smoothness_mean,area_mean,
+               concavity_se,texture_mean,concavity_worst,
+               smoothness_se ,
+              concave points_se ,
+              area_worst ,
+              compactness_mean ,
+              radius_mean ,
+              area_se ,
+              concave points_worst ,
+              iuytr ,
+              fractal_dimension_worst ,
+              perimeter_worst ,
+              texture_se ,
+              fractal_dimension_mean ,
+              texture_worst ,
+              smoothness_worst ,
+              concavity_mean ,
+              id,
+              symmetry_worst,
+              fractal_dimension_se,
+              perimeter_mean,
+              compactness_worst,
+              symmetry_se,
+              radius_se ]

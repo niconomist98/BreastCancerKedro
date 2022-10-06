@@ -1,0 +1,15 @@
+artifact_uri: file:///D:/nico/Maestria/CursoCD/BreastCancerKedro/breastkedro/mlruns/1/4d72f8a9c6cc47ac8eb7e7d0c0b0cd78/artifacts
+end_time: 1665096832320
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: 4d72f8a9c6cc47ac8eb7e7d0c0b0cd78
+run_uuid: 4d72f8a9c6cc47ac8eb7e7d0c0b0cd78
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1665096826852
+status: 3
+tags: []
+user_id: NICON
