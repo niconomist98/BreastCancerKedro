@@ -92,7 +92,7 @@ def split_data(data: pd.DataFrame, parameters: Dict) -> Tuple:
     mlflow.log_param("split test_size", parameters['split']['test_size'])
 
     # defining features and target_column
-    x_features = data[parameters['features']]
+    x_features = data[parameters['features2']]
     y_target = data[parameters['target_column']]
 
     x_train, x_test, y_train, y_test = train_test_split(
@@ -112,10 +112,10 @@ def split_data(data: pd.DataFrame, parameters: Dict) -> Tuple:
 # Function to validate data integrity
 def data_integrity_validation(data: pd.DataFrame,
                               parameters: Dict) -> pd.DataFrame:
+    data=data.drop('Unnamed: 0',axis=1)
     label = parameters['target_column']
 
-    dataset = Dataset(data,
-                 label=label)
+    dataset = Dataset(data, label=label)
 
     # Run Suite:
     integ_suite = data_integrity()
@@ -214,3 +214,32 @@ def clean_blankspaces(data:pd.DataFrame,cols_to_clean:list)-> pd.DataFrame:
     return data
 
 
+
+def train_test_validation_dataset(x_train,
+                                  x_test,
+                                  y_train,
+                                  y_test,
+                                  parameters: Dict) -> Tuple:
+    categorical_features = parameters['categorical_cols']
+    label = parameters['target_column']
+
+    train_df = pd.concat([x_train, y_train], axis=1)
+    test_df = pd.concat([x_test, y_test], axis=1)
+
+    train_ds = Dataset(train_df,
+                       label=label,
+                       cat_features=categorical_features
+                       )
+    test_ds = Dataset(test_df,
+                      label=label,
+                      cat_features=categorical_features
+                      )
+    validation_suite = train_test_validation()
+    suite_result = validation_suite.run(train_ds, test_ds)
+    mlflow.set_experiment('Breast Cancer')
+    mlflow.log_param("train_test validation", str(suite_result.passed()))
+    if not suite_result.passed():
+        # save report in data/08_reporting
+        suite_result.save_as_html('data/08_reporting/train_test_check.html')
+        logger.error("Train / Test Dataset not pass validation tests")
+    return x_train, x_test, y_train, y_test

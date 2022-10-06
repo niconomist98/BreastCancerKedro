@@ -12,6 +12,8 @@ data_preprocessed:
   type: pandas.CSVDataSet
   filepath: data/02_intermediate/data_preprocessed.csv
   layer: primary
+  save_args:
+    index: False
 
 x_train:
   type: pandas.CSVDataSet

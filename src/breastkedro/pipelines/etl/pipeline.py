@@ -29,14 +29,32 @@ def create_pipeline(**kwargs) -> Pipeline:
                 outputs="data_integrity_check",
                 name="data_integrity_validation"),
 
+            node(func=split_data,
+                  inputs=["data_integrity_check","parameters"],
+                 outputs=["x_train_split",
+                          "x_test_split",
+                          "y_train_split",
+                          "y_test_split"],
+                 name="split-train_test",
+                 ),
             node(
-                func=split_data,
-                inputs=["data_integrity_check", "parameters"],
-                outputs=["x_train_split",
-                         "x_test_split",
-                         "y_train_split",
-                         "y_test_split"],
-                name="split-train_test",
+                func=train_test_validation_dataset,
+                inputs=["x_train_split",
+                        "x_test_split",
+                        "y_train_split",
+                        "y_test_split",
+                        "parameters"],
+                outputs=["x_train", "x_test", "y_train", "y_test"],
+                name="validation-split-train_test",
             )
+            #node(
+            #    func=split_data,
+            #    inputs=["data_integrity_check", "parameters"],
+            #    outputs=["x_train_split",
+            #             "x_test_split",
+            #             "y_train_split",
+            #             "y_test_split"],
+            #    name="split-train_test",
+            #)
 
                                               ])
