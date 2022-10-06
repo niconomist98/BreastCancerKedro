@@ -27,7 +27,8 @@ from feature_engine.selection import DropConstantFeatures, DropDuplicateFeatures
 
 logger = logging.getLogger(__name__)
 
-def etl_processing(data: pd.DataFrame) -> pd.DataFrame:
+def etl_processing(data: pd.DataFrame,
+                   parameters: Dict[str, Any]) -> pd.DataFrame:
     """
     General transformations to the data like removing columns with
     the same constant value, duplicated columns., duplicate values
@@ -45,12 +46,13 @@ def etl_processing(data: pd.DataFrame) -> pd.DataFrame:
             .pipe(clean_blankspaces, cols_to_clean=data.columns)
             .pipe(replace_values,
                   replace_values=['rxctf378968 7656463sdfg', '-88888765432345.0', '999765432456788.0', '?'])
+            .pipe(clean_misslabeled)
+            .pipe(transform_output)
             .pipe(data_tofloat)
             .pipe(to_category)
             .pipe(drop_exact_duplicates)
             .pipe(drop_duplicates, drop_cols=['index'])
-            .pipe(clean_misslabeled)
-            .pipe(transform_output)
+
             .pipe(drop_exact_duplicates)
             .pipe(sort_data, col='diagnosis')
                     )
