@@ -31,7 +31,6 @@ features:
   -smoothness_worst
   -concavity_mean
   -id
-  -symmetry_mean
   -symmetry_worst
   -erty
   -fractal_dimension_se
@@ -39,7 +38,7 @@ features:
   -compactness_worst
   -symmetry_se
   -compactness_se
-  -radius_se|
+  -radius_se
   
 
 target_column: diagnosis
@@ -72,7 +71,6 @@ numerical_cols:
   -smoothness_worst
   -concavity_mean
   -id
-  -symmetry_mean
   -symmetry_worst
   -erty
   -fractal_dimension_se
@@ -110,7 +108,6 @@ features2:
               id,
               symmetry_worst,
               fractal_dimension_se,
-              perimeter_mean,
               compactness_worst,
               symmetry_se,
               radius_se ]

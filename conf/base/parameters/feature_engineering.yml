@@ -3,3 +3,18 @@
 #
 # Documentation for this file format can be found in "Parameters"
 # Link: https://kedro.readthedocs.io/en/0.18.3/kedro_project_setup/configuration.html#parameters
+
+featuresfe:
+  [perimeter_se,
+   radius_worst,concavity_worst,
+   smoothness_se,
+   area_se,
+   fractal_dimension_worst,
+   texture_se,
+   texture_worst,
+   smoothness_worst,
+   symmetry_worst,
+   fractal_dimension_se,
+   symmetry_se]
+
+target_columnfe: diagnosis
