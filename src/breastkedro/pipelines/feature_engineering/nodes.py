@@ -79,9 +79,7 @@ def first_processing(data: pd.DataFrame, parameters: Dict[str, Any]) -> pd.DataF
 
     pipe_functions = [
         ('Drop_hc_features',FunctionTransformer(drop_hc_cols)),
-        ('data_scaling', FunctionTransformer(scalate_var)),
-        ('outlier_to_na',FunctionTransformer(outlier_tona)),
-        ('missing_imputer',FunctionTransformer(imputer_KNN))]
+       ]
 
 
     # get methods name for experimentation tracking
@@ -99,15 +97,32 @@ def numerical_pipeline(numerical_cols, parameters: Dict[str, Any]):
     dictionary o a list of numerical transformations in tuples
     """
     pipe_functions = [
-        ('median_imputer', SimpleImputer(strategy='median'))
+        ('outlier_to_na', FunctionTransformer(outlier_tona)),
+        ('missing_imputer', FunctionTransformer(imputer_KNN))
+
     ]
     # get methods name for experimentation tracking
     methods = ['median_imputer']
 
-    mlflow.set_experiment('readmission')
+    mlflow.set_experiment('Breast Cancer')
     mlflow.log_param('numerical_transform', methods)
     numerical_pipe = Pipeline(steps=pipe_functions)
     return ('numerical', numerical_pipe, numerical_cols)
+
+def data_type_split(data: pd.DataFrame, parameters: Dict[str, Any]):
+
+    if parameters['numerical_cols'] and parameters['categorical_cols']:
+        numerical_cols = parameters['numerical_cols']
+        categorical_cols = parameters['categorical_cols']
+    else:
+        numerical_cols = make_column_selector(dtype_include=np.number)(data)
+        categorical_cols = make_column_selector(dtype_exclude=np.number)(data)
+
+    mlflow.set_experiment('readmission')
+    mlflow.log_param('num_cols', numerical_cols)
+    mlflow.log_param('cat_cols', categorical_cols)
+
+    return numerical_cols, categorical_cols
 
 def scalate_var(data:pd.DataFrame,msg:str)->pd.DataFrame:
     tipificado = StandardScaler().fit(data)  ##Creating a scaler
@@ -129,6 +144,24 @@ def imputer_KNN (X_train:pd.DataFrame,msg:str)->pd.DataFrame:
     X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns)
 
     return X_train
+
+def last_processing(data: pd.DataFrame,
+                    first: Tuple,
+                    numerical: Tuple) -> Pipeline:
+    pipe_transforms = Pipeline(steps= [
+        first,
+        ('Columns',ColumnTransformer(
+            transformers=[numerical],
+            remainder='drop'
+        )),
+        ('data_scaling', FunctionTransformer(scalate_var)),
+        ])
+    data_transformed = pipe_transforms.fit_transform(data)
+    mlflow.set_experiment('Breast Cancer')
+    mlflow.log_param(f"shape train_transformed", data_transformed.shape)
+
+    return pipe_transforms, data_transformed
+
 
 ##function to transform outliers in nas
 def outlier_tona(data:pd.DataFrame,msg:str)->pd.DataFrame:
@@ -193,3 +226,27 @@ def clean_blankspaces(data:pd.DataFrame,cols_to_clean:list)-> pd.DataFrame:
 def drop_exact_duplicates(data: pd.DataFrame) -> pd.DataFrame:
     """Drop duplicate rows from data."""
     return data.drop_duplicates(keep=False)
+
+def post_processing(x_in: np.ndarray, y_train: np.ndarray) -> np.ndarray:
+    """
+    General processing to transformed data, like remove duplicates
+    important after transformation the data types are numpy ndarray
+    Args:
+        x_in: x data after transformations
+        y_train: y_train
+    Returns:
+    """
+    methods = ["remove duplicates"]
+    mlflow.set_experiment('readmission')
+    mlflow.log_param('post-processing', methods)
+
+    y = y_train['readmitted'].to_numpy().reshape(-1, 1)
+
+    data = np.concatenate([x_in, y], axis=1)
+
+    # remove duplicates
+    data = np.unique(data, axis=0)
+    y_out = data[:, -1]
+    x_out = data[:, :-1]
+    mlflow.log_param('shape post-processing', x_out.shape)
+    return x_out, y_out

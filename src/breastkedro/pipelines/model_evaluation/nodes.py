@@ -1,7 +1,19 @@
 """
 This is a boilerplate pipeline 'model_evaluation'
-generated using Kedro 0.18.3
+generated using Kedro 0.18.2
 """
+import logging
+
+import numpy as np
+import pandas as pd
+from typing import Any, Dict
+from sklearn.metrics import recall_score
+import mlflow
+
+from deepchecks.tabular import Dataset
+from deepchecks.tabular.suites import model_evaluation
+
+logger = logging.getLogger(__name__)
 logger = logging.getLogger(__name__)
 
 def evaluate_model(predictions: np.ndarray,
