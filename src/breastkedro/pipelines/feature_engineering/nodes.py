@@ -17,6 +17,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
+from sklearn.impute import KNNImputer
 
 logger = logging.getLogger(__name__)
 
@@ -86,28 +87,12 @@ def first_processing(data: pd.DataFrame, parameters: Dict[str, Any]) -> pd.DataF
     methods = []
     for name, _ in pipe_functions:
         methods.append(name)
-    mlflow.set_experiment('readmission')
+    mlflow.set_experiment('Breast cancer')
     mlflow.log_param('first-processing', methods)
 
     pipeline_train_data = Pipeline(steps=pipe_functions)
     return data, ('first_processing', pipeline_train_data)
 
-def numerical_pipeline(numerical_cols, parameters: Dict[str, Any]):
-    """
-    dictionary o a list of numerical transformations in tuples
-    """
-    pipe_functions = [
-        ('outlier_to_na', FunctionTransformer(outlier_tona)),
-        ('missing_imputer', FunctionTransformer(imputer_KNN))
-
-    ]
-    # get methods name for experimentation tracking
-    methods = ['median_imputer']
-
-    mlflow.set_experiment('Breast Cancer')
-    mlflow.log_param('numerical_transform', methods)
-    numerical_pipe = Pipeline(steps=pipe_functions)
-    return ('numerical', numerical_pipe, numerical_cols)
 
 def data_type_split(data: pd.DataFrame, parameters: Dict[str, Any]):
 
@@ -124,21 +109,21 @@ def data_type_split(data: pd.DataFrame, parameters: Dict[str, Any]):
 
     return numerical_cols, categorical_cols
 
-def scalate_var(data:pd.DataFrame,msg:str)->pd.DataFrame:
+def scalate_var(data:pd.DataFrame)->pd.DataFrame:
     tipificado = StandardScaler().fit(data)  ##Creating a scaler
     x_train = pd.DataFrame(tipificado.transform(data), columns=data.columns)  ##scaling x_train
     return x_train
 
-def drop_hc_cols(data:pd.DataFrame,msg:str)-> pd.DataFrame:
+def drop_hc_cols(data:pd.DataFrame)-> pd.DataFrame:
     """Function to drop higlhy correlated features of breast cancer dataset"""
-    data=data[['radius_worst', 'concavity_worst', 'fractal_dimension_worst',
-       'texture_worst', 'smoothness_worst', 'symmetry_worst', 'perimeter_se',
-       'smoothness_se', 'area_se', 'texture_se', 'fractal_dimension_se',
-       'symmetry_se', 'diagnosis', 'symmetry_mean']]
-    print(f'{msg}')
+    cols_to_keep = ['radius_worst', 'concavity_worst', 'fractal_dimension_worst',
+                    'texture_worst', 'smoothness_worst', 'symmetry_worst', 'perimeter_se',
+                    'smoothness_se', 'area_se', 'texture_se', 'fractal_dimension_se',
+                    'symmetry_se']
+    data=data[cols_to_keep]
     return data
 
-def imputer_KNN (X_train:pd.DataFrame,msg:str)->pd.DataFrame:
+def imputer_KNN (X_train:pd.DataFrame)->pd.DataFrame:
     """Use knn to impute na values """
     imputer = KNNImputer(n_neighbors=5)
     X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns)
@@ -146,16 +131,14 @@ def imputer_KNN (X_train:pd.DataFrame,msg:str)->pd.DataFrame:
     return X_train
 
 def last_processing(data: pd.DataFrame,
-                    first: Tuple,
-                    numerical: Tuple) -> Pipeline:
+                    first: Tuple):
     pipe_transforms = Pipeline(steps= [
         first,
-        ('Columns',ColumnTransformer(
-            transformers=[numerical],
-            remainder='drop'
-        )),
         ('data_scaling', FunctionTransformer(scalate_var)),
-        ])
+        ('outlier_to_na', FunctionTransformer(outlier_tona)),
+        ('missing_imputer', FunctionTransformer(imputer_KNN))
+
+    ])
     data_transformed = pipe_transforms.fit_transform(data)
     mlflow.set_experiment('Breast Cancer')
     mlflow.log_param(f"shape train_transformed", data_transformed.shape)
@@ -164,7 +147,7 @@ def last_processing(data: pd.DataFrame,
 
 
 ##function to transform outliers in nas
-def outlier_tona(data:pd.DataFrame,msg:str)->pd.DataFrame:
+def outlier_tona(data:pd.DataFrame)->pd.DataFrame:
     """convert outliers to na"""
     for i in data.columns:
         Q1 = data[i].quantile(0.25)
@@ -237,10 +220,10 @@ def post_processing(x_in: np.ndarray, y_train: np.ndarray) -> np.ndarray:
     Returns:
     """
     methods = ["remove duplicates"]
-    mlflow.set_experiment('readmission')
+    mlflow.set_experiment('BreastCancer')
     mlflow.log_param('post-processing', methods)
 
-    y = y_train['readmitted'].to_numpy().reshape(-1, 1)
+    y = y_train['diagnosis'].to_numpy().reshape(-1, 1)
 
     data = np.concatenate([x_in, y], axis=1)
 

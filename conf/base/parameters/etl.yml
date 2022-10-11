@@ -39,7 +39,7 @@ features:
   -symmetry_se
   -compactness_se
   -radius_se
-  
+  -symmetry_mean
 
 target_column: diagnosis
 
@@ -79,7 +79,7 @@ numerical_cols:
   -symmetry_se
   -compactness_se
   -radius_se
-
+  -symmetry_mean
 split:
   test_size: 0.2
   random_state: 3
@@ -110,4 +110,4 @@ features2:
               fractal_dimension_se,
               compactness_worst,
               symmetry_se,
-              radius_se ]
+              radius_se]
