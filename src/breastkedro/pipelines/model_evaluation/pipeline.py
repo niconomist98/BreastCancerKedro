@@ -16,24 +16,25 @@ def create_pipeline(**kwargs) -> Pipeline:
                         'params:train'],
                 outputs="score_train",
                 name="train_model_evaluation"
-            ),
-            node(
-                func=evaluate_model,
-                inputs=["predictions_test",
-                        "y_test",
-                        'params:test'],
-                outputs="score_test",
-                name="test_model_evaluation"
-            ),
-            node(
-                func=model_evaluation_check,
-                inputs=["x_train_model_input",
-                        "x_test_transformed",
-                        "y_train_model_input",
-                        "y_test",
-                        "model_trained"],
-                outputs=None,
-                name="model_evaluation_check"
             )
+            #,
+            #node(
+            #    func=evaluate_model,
+             #   inputs=["predictions_test",
+              #          "y_test",
+               #         'params:test'],
+                #outputs="score_test",
+                #name="test_model_evaluation"
+            #),
+            #node(
+             #   func=model_evaluation_check,
+              #  inputs=["x_train_model_input",
+               #         "x_test_transformed",
+                #        "y_train_model_input",
+                 #       "y_test",
+                  #      "model_trained"],
+                #outputs=None,
+                #name="model_evaluation_check"
+            #)
         ]
     )

@@ -139,7 +139,7 @@ def last_processing(data: pd.DataFrame,
         ('missing_imputer', FunctionTransformer(imputer_KNN))
 
     ])
-    data_transformed = pipe_transforms.fit_transform(data)
+    data_transformed =pd.DataFrame(pipe_transforms.fit_transform(data))
     mlflow.set_experiment('Breast Cancer')
     mlflow.log_param(f"shape train_transformed", data_transformed.shape)
 

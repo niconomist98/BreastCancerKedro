@@ -48,6 +48,7 @@ def test_transform(x_test: pd.DataFrame,
     """ predictions for dataframe"""
     logger.info("transform X_test")
     x_test_transformed = train_transformer.transform(x_test)
+    ## aca poner como np
     mlflow.set_experiment('BreastCancer')
     mlflow.log_param(f"shape test_transformed", x_test_transformed.shape)
     return x_test_transformed
