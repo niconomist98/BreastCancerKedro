@@ -11,11 +11,17 @@ from .nodes import *
 
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
-        [   node(
+        [node(
                 func=pre_processing,
                 inputs=["x_train","y_train", "parameters"],
                 outputs=["x_train_out", "y_train_out"],
-                name="pre_processing",
+                name="pre_processing"
+            ),
+            node(
+                func=first_processing,
+                inputs=["x_train_out","parameters"],
+                outputs=["data_first", "first_processing_pipline"],
+                name = "first_processing"
             )
 
         ]

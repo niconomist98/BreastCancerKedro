@@ -37,12 +37,9 @@ def pre_processing(x: pd.DataFrame,
        'smoothness_se', 'area_se', 'texture_se', 'fractal_dimension_se',
        'symmetry_se', 'diagnosis']
     
-    pipe_functions = [
-                ('Drop unnecesary columns',FunctionTransformer(drop_cols,
-                                                    kw_args={'cols_to_keep':cols_to_keep}
-                                                ))
+    pipe_functions =[
+                ('Drop unnecesary columns',FunctionTransformer(drop_cols))]
 
-    ]
     methods = ['Drop unnecesary columns']
     pipeline_pre_processing = Pipeline(steps=pipe_functions)
     data_processed = pipeline_pre_processing.fit_transform(data)                                            
@@ -59,8 +56,140 @@ def pre_processing(x: pd.DataFrame,
 
 
 # function to filter data from a column if is in a list of values
-def drop_cols(data: pd.DataFrame,
-                       cols_to_keep: list) -> pd.DataFrame:
+def drop_cols(data: pd.DataFrame) -> pd.DataFrame:
     """Filter columns from data."""
+    cols_to_keep=['radius_worst', 'concavity_worst', 'fractal_dimension_worst',
+       'texture_worst', 'smoothness_worst', 'symmetry_worst', 'perimeter_se',
+       'smoothness_se', 'area_se', 'texture_se', 'fractal_dimension_se',
+       'symmetry_se', 'diagnosis']
     data = data[cols_to_keep]
     return data
+
+def first_processing(data: pd.DataFrame, parameters: Dict[str, Any]) -> pd.DataFrame:
+    """
+    create pipeline of General transformations to the data like creating new features.
+    Args:
+        data: train data after splitting
+        parameters: list of the general transforms to apply to all the data
+    Returns:
+        pd.DataFrame: transformed data
+    """
+    logger.info(f"Shape = {data.shape} first_processing")
+
+
+    pipe_functions = [
+        ('Drop_hc_features',FunctionTransformer(drop_hc_cols)),
+        ('data_scaling', FunctionTransformer(scalate_var)),
+        ('outlier_to_na',FunctionTransformer(outlier_tona)),
+        ('missing_imputer',FunctionTransformer(imputer_KNN))]
+
+
+    # get methods name for experimentation tracking
+    methods = []
+    for name, _ in pipe_functions:
+        methods.append(name)
+    mlflow.set_experiment('readmission')
+    mlflow.log_param('first-processing', methods)
+
+    pipeline_train_data = Pipeline(steps=pipe_functions)
+    return data, ('first_processing', pipeline_train_data)
+
+def numerical_pipeline(numerical_cols, parameters: Dict[str, Any]):
+    """
+    dictionary o a list of numerical transformations in tuples
+    """
+    pipe_functions = [
+        ('median_imputer', SimpleImputer(strategy='median'))
+    ]
+    # get methods name for experimentation tracking
+    methods = ['median_imputer']
+
+    mlflow.set_experiment('readmission')
+    mlflow.log_param('numerical_transform', methods)
+    numerical_pipe = Pipeline(steps=pipe_functions)
+    return ('numerical', numerical_pipe, numerical_cols)
+
+def scalate_var(data:pd.DataFrame,msg:str)->pd.DataFrame:
+    tipificado = StandardScaler().fit(data)  ##Creating a scaler
+    x_train = pd.DataFrame(tipificado.transform(data), columns=data.columns)  ##scaling x_train
+    return x_train
+
+def drop_hc_cols(data:pd.DataFrame,msg:str)-> pd.DataFrame:
+    """Function to drop higlhy correlated features of breast cancer dataset"""
+    data=data[['radius_worst', 'concavity_worst', 'fractal_dimension_worst',
+       'texture_worst', 'smoothness_worst', 'symmetry_worst', 'perimeter_se',
+       'smoothness_se', 'area_se', 'texture_se', 'fractal_dimension_se',
+       'symmetry_se', 'diagnosis', 'symmetry_mean']]
+    print(f'{msg}')
+    return data
+
+def imputer_KNN (X_train:pd.DataFrame,msg:str)->pd.DataFrame:
+    """Use knn to impute na values """
+    imputer = KNNImputer(n_neighbors=5)
+    X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns)
+
+    return X_train
+
+##function to transform outliers in nas
+def outlier_tona(data:pd.DataFrame,msg:str)->pd.DataFrame:
+    """convert outliers to na"""
+    for i in data.columns:
+        Q1 = data[i].quantile(0.25)
+        Q3 = data[i].quantile(0.75)
+        IQR = Q3 - Q1
+        data[i] = np.where((data[i] < (Q1 - 1.5 * IQR)) | (data[i] > (Q3 + 1.5 * IQR)), np.nan, data[i])
+
+    return data
+##function to transform target to category
+def to_category(data:pd.DataFrame)->pd.DataFrame:
+    """Convert a colum to category"""
+    data['diagnosis'].astype('category')
+    return data
+
+
+
+
+# function to print shape of the dataframe
+def print_shape(data: pd.DataFrame, msg: str = 'Shape =') -> pd.DataFrame:
+    """Print shape of dataframe."""
+    print(f'{data.shape}{msg}')
+    return data
+
+#Function to convert columns of a df to float type
+def data_tofloat(data:pd.DataFrame)->pd.DataFrame:
+    """Change dataset columns dtype"""
+    data=data.astype('float')
+    return data
+#function to convert columns of a df to stirng type
+
+def data_tostring(data:pd.DataFrame)->pd.DataFrame:
+    """Convert dataset columns to type string """
+    data = data.astype('string')
+    return data
+
+# remove duplicates from data based on a column
+def drop_duplicates(data: pd.DataFrame,
+                    drop_cols: list) -> pd.DataFrame:
+    """Drop duplicate rows from data."""
+    return data.drop_duplicates(subset=drop_cols, keep=False)
+
+
+
+# function to replace values with np.nan
+def replace_missing_values(data: pd.DataFrame,
+                           replace_values: list) -> pd.DataFrame:
+    """Replace missing values in data with np.nan"""
+    data=data.replace(replace_values, np.nan)
+    return data
+
+#Function to clean blankspaces after each string of the dataset
+def clean_blankspaces(data:pd.DataFrame,cols_to_clean:list)-> pd.DataFrame:
+    """Function to delete blankspaces after and before each string of the dataset"""
+    for i in cols_to_clean:
+        data[i] = data[i].str.strip()
+    return data
+
+
+def drop_exact_duplicates(data: pd.DataFrame) -> pd.DataFrame:
+    """Drop duplicate rows from data."""
+    return data.drop_duplicates(keep=False)
