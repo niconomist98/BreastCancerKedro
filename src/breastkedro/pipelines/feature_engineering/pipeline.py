@@ -22,6 +22,7 @@ def create_pipeline(**kwargs) -> Pipeline:
                 inputs=["x_train_out","parameters"],
                 outputs=["data_first", "first_processing_pipline"],
                 name = "first_processing"
+                ##aca vamos en los pipelines
             )
 
         ]
