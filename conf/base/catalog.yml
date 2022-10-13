@@ -70,13 +70,13 @@ model_trained:
 
 predictions_train:
   type: pickle.PickleDataSet
-  filepath: data/07_model_output/predicts.pkl
+  filepath: data/07_model_output/predictstrain.pkl
   backend: pickle
   layer : models
 
 predictions_test:
     type: pickle.PickleDataSet
-    filepath: data/07_model_output/predicts.pkl
+    filepath: data/07_model_output/predictstest.pkl
     backend : pickle
     layer: models
 

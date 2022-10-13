@@ -40,6 +40,7 @@ def model_evaluation_check(x_train: np.ndarray,
                            model):
 
     y_test = y_test['diagnosis'].to_numpy()
+    x_test=x_test.to_numpy()
     train_ds = Dataset(x_train, label=y_train, cat_features=[])
     test_ds = Dataset(x_test, label=y_test, cat_features=[])
 
