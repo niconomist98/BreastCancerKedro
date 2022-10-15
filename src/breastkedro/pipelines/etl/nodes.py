@@ -38,7 +38,7 @@ def etl_processing(data: pd.DataFrame,
     Returns:
         pd.DataFrame: transformed data
 """
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param("shape raw_data", data.shape)
 
     data = (data
@@ -67,7 +67,7 @@ def etl_processing(data: pd.DataFrame,
     for name, _ in pipe_functions:
         methods.append(name)
 
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param('etl_transforms', methods)
 
     pipeline_train_data = Pipeline(steps=pipe_functions)
@@ -87,7 +87,7 @@ def split_data(data: pd.DataFrame, parameters: Dict) -> Tuple:
     Returns:
         Split data.
     """
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param("split random_state", parameters['split']['random_state'])
     mlflow.log_param("split test_size", parameters['split']['test_size'])
 
@@ -120,7 +120,7 @@ def data_integrity_validation(data: pd.DataFrame,
     # Run Suite:
     integ_suite = data_integrity()
     suite_result = integ_suite.run(dataset)
-    mlflow.set_experiment('Breast Cancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param(f"data integrity validation", str(suite_result.passed()))
     if not suite_result.passed():
         # save report in data/08_reporting
@@ -236,7 +236,7 @@ def train_test_validation_dataset(x_train,
                       )
     validation_suite = train_test_validation()
     suite_result = validation_suite.run(train_ds, test_ds)
-    mlflow.set_experiment('Breast Cancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param("train_test validation", str(suite_result.passed()))
     if not suite_result.passed():
         # save report in data/08_reporting

@@ -5,7 +5,8 @@ generated using Kedro 0.18.3
 import importlib
 import logging
 from typing import Any, Dict
-
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import SGDClassifier
 import numpy as np
 import pandas as pd
 import mlflow
@@ -34,9 +35,9 @@ def train_model(x_features: np.ndarray,
 
     logger.info("training model")
 
-    model = GaussianNB()
+    model = SGDClassifier(random_state = 42)
 
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.set_tag("mlflow.runName", model.__class__.__name__)
 
     model.fit(x_train, y_train)
@@ -49,7 +50,7 @@ def test_transform(x_test: pd.DataFrame,
     logger.info("transform X_test")
     x_test_transformed = train_transformer.transform(x_test)
     ## aca poner como np
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param(f"shape test_transformed", x_test_transformed.shape)
     return x_test_transformed
 

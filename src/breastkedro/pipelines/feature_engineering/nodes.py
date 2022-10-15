@@ -44,7 +44,7 @@ def pre_processing(x: pd.DataFrame,
     methods = ['Drop unnecesary columns']
     pipeline_pre_processing = Pipeline(steps=pipe_functions)
     data_processed = pipeline_pre_processing.fit_transform(data)                                            
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param('pre-processing', methods)
 
     x_out = data_processed[parameters['featuresfe']]
@@ -87,7 +87,7 @@ def first_processing(data: pd.DataFrame, parameters: Dict[str, Any]) -> pd.DataF
     methods = []
     for name, _ in pipe_functions:
         methods.append(name)
-    mlflow.set_experiment('Breast cancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param('first-processing', methods)
 
     pipeline_train_data = Pipeline(steps=pipe_functions)
@@ -103,7 +103,7 @@ def data_type_split(data: pd.DataFrame, parameters: Dict[str, Any]):
         numerical_cols = make_column_selector(dtype_include=np.number)(data)
         categorical_cols = make_column_selector(dtype_exclude=np.number)(data)
 
-    mlflow.set_experiment('readmission')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param('num_cols', numerical_cols)
     mlflow.log_param('cat_cols', categorical_cols)
 
@@ -140,7 +140,7 @@ def last_processing(data: pd.DataFrame,
 
     ])
     data_transformed =pd.DataFrame(pipe_transforms.fit_transform(data))
-    mlflow.set_experiment('Breast Cancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param(f"shape train_transformed", data_transformed.shape)
 
     return pipe_transforms, data_transformed
@@ -220,7 +220,7 @@ def post_processing(x_in: np.ndarray, y_train: np.ndarray) -> np.ndarray:
     Returns:
     """
     methods = ["remove duplicates"]
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param('post-processing', methods)
 
     y = y_train['diagnosis'].to_numpy().reshape(-1, 1)

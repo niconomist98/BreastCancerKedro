@@ -26,7 +26,7 @@ def evaluate_model(predictions: np.ndarray,
 
     logger.info(f"Model accuracy {name}= {score}")
 
-    mlflow.set_experiment('BreastCancer')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_metric(f"recall {name}", score)
 
     # parse the score to a string with only 4 decimal places
@@ -46,7 +46,7 @@ def model_evaluation_check(x_train: np.ndarray,
 
     evaluation_suite = model_evaluation()
     suite_result = evaluation_suite.run(train_ds, test_ds, model)
-    mlflow.set_experiment('diagnosis')
+    mlflow.set_experiment('BreastCancer-Stochastic Dradient Descendent')
     mlflow.log_param(f"model evaluation validation", str(suite_result.passed()))
     if not suite_result.passed():
         #save report in data/08_reporting
